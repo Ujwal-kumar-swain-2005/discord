@@ -1,8 +1,5 @@
 package com.substring.chat.entities;
 
-import lombok.Data;
-
-@Data
 public class WhiteboardEvent {
 
     private String roomId;

@@ -1,19 +1,8 @@
-// FULL updated AuthContext.jsx
-
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
-/**
- * INTERVIEW CONCEPT — JWT Decoding on the Frontend:
- * A JWT is: base64(header) . base64(payload) . signature
- * The payload is NOT encrypted — just Base64 encoded.
- * So we can decode it client-side using atob() to read claims
- * like username, roles, expiry — WITHOUT calling the server.
- *
- * This is intentional by design: JWTs are "self-contained tokens".
- * The server embeds data at sign-time; clients can read (not forge) it.
- */
+
 const decodeToken = (jwt) => {
   if (!jwt) return {};
   try {
@@ -23,36 +12,94 @@ const decodeToken = (jwt) => {
   }
 };
 
-export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(localStorage.getItem("token"));
+const isTokenExpired = (jwt) => {
+  const payload = decodeToken(jwt);
+  if (!payload.exp) return true;
 
+  return payload.exp * 1000 < Date.now();
+};
+
+export const AuthProvider = ({ children }) => {
+  /**
+   * Initialize token from localStorage
+   * Also remove if expired
+   */
+  const [token, setToken] = useState(() => {
+    const savedToken = localStorage.getItem("token");
+
+    if (savedToken && isTokenExpired(savedToken)) {
+      localStorage.removeItem("token");
+      return null;
+    }
+
+    return savedToken;
+  });
+
+  /**
+   * Login function
+   */
   const login = (jwt) => {
     localStorage.setItem("token", jwt);
     setToken(jwt);
   };
 
+  /**
+   * Logout function
+   */
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
+    window.location.href = "/login"; // redirect
   };
 
-  // Derived from token — no extra state needed
+  /**
+   * Auto logout when token expires
+   */
+  useEffect(() => {
+    if (!token) return;
+
+    const payload = decodeToken(token);
+    if (!payload.exp) return;
+
+    const timeLeft = payload.exp * 1000 - Date.now();
+
+    if (timeLeft <= 0) {
+      logout();
+    } else {
+      const timer = setTimeout(() => {
+        logout();
+      }, timeLeft);
+
+      return () => clearTimeout(timer);
+    }
+  }, [token]);
+
+  /**
+   * Extract user info
+   */
   const payload = decodeToken(token);
   const username = payload.username || "";
-  const getRoles = () => payload.roles || [];
-  const isAdmin = () => getRoles().includes("ROLE_ADMIN");
+  const roles = payload.roles || [];
+
+  const isAdmin = () => roles.includes("ROLE_ADMIN");
 
   return (
-    /**
-     * INTERVIEW CONCEPT — React Context as a Service Locator:
-     * We expose `username` here so ANY component in the tree can
-     * call useAuth() and get the logged-in user's name — without
-     * prop drilling or re-fetching from the server.
-     */
-    <AuthContext.Provider value={{ token, login, logout, isAdmin, username }}>
+    <AuthContext.Provider
+      value={{
+        token,
+        login,
+        logout,
+        username,
+        roles,
+        isAdmin,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
 };
 
+/**
+ * Custom hook
+ */
 export const useAuth = () => useContext(AuthContext);

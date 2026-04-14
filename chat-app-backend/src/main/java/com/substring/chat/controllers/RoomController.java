@@ -56,8 +56,6 @@ public class RoomController {
     }
 
 
-    //get messages of room
-
     @GetMapping("/{roomId}/messages")
     public ResponseEntity<List<Message>> getMessages(
             @PathVariable String roomId,
@@ -69,8 +67,6 @@ public class RoomController {
             return ResponseEntity.badRequest().build()
                     ;
         }
-        //get messages :
-        //pagination
         List<Message> messages = room.getMessages();
         int start = Math.max(0, messages.size() - (page + 1) * size);
         int end = Math.min(messages.size(), start + size);

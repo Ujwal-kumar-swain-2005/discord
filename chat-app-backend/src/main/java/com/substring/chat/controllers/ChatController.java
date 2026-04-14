@@ -24,9 +24,8 @@ public class ChatController {
     }
 
 
-    //for sending and receiving messages
-    @MessageMapping("/sendMessage/{roomId}")// /app/sendMessage/roomId
-    @SendTo("/topic/room/{roomId}")//subscribe
+    @MessageMapping("/sendMessage/{roomId}")
+    @SendTo("/topic/room/{roomId}")
     public Message sendMessage(
             @DestinationVariable String roomId,
             @RequestBody MessageRequest request

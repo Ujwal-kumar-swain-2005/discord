@@ -308,8 +308,6 @@ function AiChatPanel({ username }) {
     </div>
   );
 }
-
-// ─── Main Component ───────────────────────────────────────────────────────────
 const JoinCreateChat = () => {
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -341,7 +339,7 @@ const JoinCreateChat = () => {
     try {
       const room = await joinChatApi(roomId);
       toast.success(`Joined #${room.roomId}!`);
-      setCurrentUser(username);   // ✅ use from JWT
+      setCurrentUser(username);  
       setRoomId(room.roomId);
       setConnected(true);
       navigate("/chat");
@@ -355,7 +353,7 @@ const JoinCreateChat = () => {
     try {
       const response = await createRoomApi(roomId.trim());
       toast.success(`Room #${response.roomId} created!`);
-      setCurrentUser(username);   // ✅ use from JWT
+      setCurrentUser(username);   
       setRoomId(response.roomId);
       setConnected(true);
       setShowCreateModal(false);
@@ -472,8 +470,6 @@ const JoinCreateChat = () => {
           <AiChatPanel username={username} />
         </div>
       </div>
-
-      {/* Modal */}
       {showCreateModal && (
         <CreateRoomModal
           onClose={() => setShowCreateModal(false)}

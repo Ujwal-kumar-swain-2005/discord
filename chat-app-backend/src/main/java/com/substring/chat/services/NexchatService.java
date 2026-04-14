@@ -1,16 +1,14 @@
 package com.substring.chat.services;
 
+import com.substring.chat.entities.ChatMessage;
 import com.substring.chat.entities.NexchatConversation;
-import com.substring.chat.entities.NexchatConversation.ChatMessage;
 import com.substring.chat.repositories.NexchatRepository;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
-
 @Service
-
 public class NexchatService {
 
     private final ChatClient chatClient;

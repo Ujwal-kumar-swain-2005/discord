@@ -1,34 +1,50 @@
 package com.substring.chat.entities;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-@Data
-@Document(collection = "nexchat_history")
+@Entity
+@Table(name = "nexchat_conversation")
 public class NexchatConversation {
 
     @Id
     private String id;
 
-    private String username;  // unique key per user
+    @Column(unique = true, nullable = false)
+    private String username;
 
+    @OneToMany(mappedBy = "conversation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages = new ArrayList<>();
+
+    public NexchatConversation() {}
+
+    @PrePersist
+    public void generateId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
+    }
+
+    // 🔥 helper method (important)
+    public void addMessage(ChatMessage message) {
+        message.setConversation(this);
+        this.messages.add(message);
+    }
+
+    // getters & setters
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public String getUsername() {
         return username;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setUsername(String username) {
@@ -41,36 +57,5 @@ public class NexchatConversation {
 
     public void setMessages(List<ChatMessage> messages) {
         this.messages = messages;
-    }
-
-    @Data
-    public static class ChatMessage {
-        private String role;    // "user" or "assistant"
-        private String content;
-        private LocalDateTime timestamp;
-
-        public String getRole() {
-            return role;
-        }
-
-        public void setRole(String role) {
-            this.role = role;
-        }
-
-        public String getContent() {
-            return content;
-        }
-
-        public void setContent(String content) {
-            this.content = content;
-        }
-
-        public LocalDateTime getTimestamp() {
-            return timestamp;
-        }
-
-        public void setTimestamp(LocalDateTime timestamp) {
-            this.timestamp = timestamp;
-        }
     }
 }

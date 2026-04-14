@@ -241,7 +241,7 @@ const HomePage = () => {
     }
   };
 
-  // Allow Enter key to submit
+ 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") handleSubmit();
   };
@@ -369,8 +369,6 @@ const HomePage = () => {
               autoComplete="new-password"
             />
           )}
-
-          {/* Submit */}
           <button
             className="submit-btn"
             onClick={handleSubmit}
@@ -402,8 +400,6 @@ const HomePage = () => {
               : mode === "login" ? "Log In" : "Create Account"
             }
           </button>
-
-          {/* Footer switch */}
           <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#80848e" }}>
             {mode === "login" ? (
               <>

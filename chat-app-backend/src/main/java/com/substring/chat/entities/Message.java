@@ -1,14 +1,24 @@
 package com.substring.chat.entities;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
 import java.time.LocalDateTime;
 
-
+/**
+ * Message is stored as part of a Room via @ElementCollection.
+ * @Embeddable means it has no independent identity/table — it is
+ * always stored inside Room's collection table.
+ * (An @Entity cannot be used with @ElementCollection; that requires @Embeddable.)
+ */
+@Embeddable
 public class Message {
-
     private String sender;
+
+    @Column(columnDefinition = "TEXT")
     private String content;
     private LocalDateTime timeStamp;
+
 
     public Message() {
     }

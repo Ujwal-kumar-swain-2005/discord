@@ -1,25 +1,24 @@
 package com.substring.chat.entities;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
+import jakarta.persistence.*;
 import java.util.List;
+import java.util.UUID;
 
-@Document(collection = "users")
-
+@Entity(name = "users")
 public class User {
 
     @Id
     private String id;
 
-    @Indexed(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(unique = true, nullable = false)
     private String username;
 
     private String password;
 
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles;
 
     public User() {
@@ -32,11 +31,18 @@ public class User {
         this.password = password;
         this.roles = roles;
     }
+
     public User(String email, String username, String password, List<String> roles) {
         this.email = email;
         this.username = username;
         this.password = password;
         this.roles = roles;
+    }
+    @PrePersist
+    public void generateId() {
+        if (this.id == null) {
+            this.id = UUID.randomUUID().toString();
+        }
     }
 
     public String getId() {

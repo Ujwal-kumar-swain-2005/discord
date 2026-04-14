@@ -96,7 +96,7 @@ const EmojiPicker = ({ onSelect, onClose }) => {
   const [search, setSearch] = useState("");
   const ref = useRef(null);
 
-  // Close on outside click
+  
   useEffect(() => {
     const handler = (e) => {
       if (ref.current && !ref.current.contains(e.target)) onClose();
@@ -255,7 +255,6 @@ const GifPicker = ({ onSelect, onClose }) => {
   );
 };
 
-// ─── MESSAGE RENDERER (handles text, image URLs, GIF URLs) ──────────────────────
 const MessageContent = ({ content }) => {
   const isImageUrl = (str) => /^https?:\/\/.+\.(png|jpg|jpeg|webp|gif)(\?.*)?$/i.test(str);
   const isGifUrl = (str) => /^https:\/\/media\.tenor\.com\//i.test(str);
@@ -270,8 +269,6 @@ const MessageContent = ({ content }) => {
       />
     );
   }
-
-  // Check if content is a base64 image (uploaded image)
   if (content.startsWith("data:image/")) {
     return (
       <img
@@ -307,7 +304,6 @@ const MessageReactions = ({ reactions = {}, onReact }) => {
   );
 };
 
-// ─── MAIN CHAT PAGE ───────────────────────────────────────────────────────────────
 const ChatPage = () => {
   const { roomId, currentUser, connected, setConnected, setRoomId, setCurrentUser } = useChatContext();
   const navigate = useNavigate();
@@ -321,14 +317,14 @@ const ChatPage = () => {
   const [showGifPicker, setShowGifPicker] = useState(false);
   const [attachedFiles, setAttachedFiles] = useState([]);
   const [hoverMessageIdx, setHoverMessageIdx] = useState(null);
-  const [messageReactions, setMessageReactions] = useState({}); // { messageIdx: { emoji: count } }
+  const [messageReactions, setMessageReactions] = useState({}); 
 
-  // Redirect if not connected
+ 
   useEffect(() => {
     if (!connected) navigate("/");
   }, [connected, navigate]);
 
-  // Load previous messages
+  
   useEffect(() => {
     async function loadMessages() {
       try {
@@ -341,14 +337,13 @@ const ChatPage = () => {
     if (connected) loadMessages();
   }, [connected, roomId]);
 
-  // Auto scroll
+
   useEffect(() => {
     if (chatBoxRef.current) {
       chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
     }
   }, [messages]);
 
-  // WebSocket connection
   useEffect(() => {
     if (!connected) return;
     const socket = new SockJS(`${baseURL}/chat`);
@@ -369,7 +364,7 @@ const ChatPage = () => {
     return () => client.deactivate();
   }, [roomId, connected]);
 
-  // Send text message
+  
   const sendMessage = useCallback(() => {
     if ((!input.trim() && attachedFiles.length === 0) || !stompClient) return;
 
@@ -393,7 +388,6 @@ const ChatPage = () => {
     }
   }, [input, attachedFiles, stompClient, currentUser, roomId]);
 
-  // Send GIF
   const sendGif = (gifUrl) => {
     if (!stompClient) return;
     const message = { sender: currentUser, content: gifUrl, roomId };
@@ -429,6 +423,10 @@ const ChatPage = () => {
 
   const handleLogout = () => {
     if (stompClient) stompClient.deactivate();
+    // Clear persisted session data
+    sessionStorage.removeItem("roomId");
+    sessionStorage.removeItem("currentUser");
+    sessionStorage.removeItem("connected");
     setConnected(false);
     setRoomId("");
     setCurrentUser("");
